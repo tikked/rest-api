@@ -1,8 +1,9 @@
 import { Container } from 'inversify';
-import { ApplicationEnvironmentRepository, Coder, StreamFactory, errorHandler } from './src/persistency';
-import { FileStreamFactory } from './src/persistency/FileStreamFactory';
-import { JsonCoder } from './src/persistency/JsonCoder';
-import { TYPES } from './src/types';
+import { ApplicationEnvironmentRepository, Coder, StreamFactory, errorHandler } from 'gq';
+import { FileStreamFactory } from 'gq';
+import { JsonCoder } from 'gq';
+import { TYPES } from 'gq';
+import { join } from 'path'
 
 export function createContainer(applicationEnvironmentRoot: string): Container {
     const container = new Container();
@@ -11,7 +12,7 @@ export function createContainer(applicationEnvironmentRoot: string): Container {
     container.bind<StreamFactory>(TYPES.StreamFactory).to(FileStreamFactory);
     container.bind<Coder>(TYPES.Coder).to(JsonCoder);
     container.bind<string>(TYPES.ApplicationEnvironmentRoot)
-        .toConstantValue(applicationEnvironmentRoot);
+        .toConstantValue(join(__dirname, applicationEnvironmentRoot));
         container.bind<errorHandler>(TYPES.ErrorHandler).toConstantValue(console.error);
     return container;
 }

@@ -8,8 +8,8 @@ import {
     requestParam
 } from 'inversify-express-utils';
 import { distinctUntilChanged, map, skip, take, timeout } from 'rxjs/operators';
-import { ApplicationEnvironment, Context } from 'gq/src/domain';
-import { ApplicationEnvironmentRepository } from '../persistency';
+import { ApplicationEnvironment, Context } from 'gq';
+import { ApplicationEnvironmentRepository } from 'gq';
 
 @controller('/application-environment')
 export class ApplicationEnvironmentController implements interfaces.Controller {

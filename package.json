@@ -34,7 +34,7 @@
     "@types/command-line-args": "^5.0.0",
     "@types/command-line-usage": "^5.0.1",
     "@types/cors": "^2.8.6",
-    "@types/express": "^4.17.1",
+    "@types/express": "^4.17.2",
     "rimraf": "^3.0.0",
     "ts-node": "^8.3.0",
     "tslint": "^5.19.0",
