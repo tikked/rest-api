@@ -1,5 +1,6 @@
 import * as express from 'express';
-import { ApplicationEnvironment, ApplicationEnvironmentRepository, Context } from 'gq';
+import { ApplicationEnvironment, Context } from 'tikked-core';
+import { ApplicationEnvironmentRepository } from 'tikked-persistency';
 import { inject } from 'inversify';
 import {
     controller,

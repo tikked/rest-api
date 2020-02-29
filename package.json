@@ -1,5 +1,5 @@
 {
-  "name": "gq-server",
+  "name": "tikked-rest-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,25 +13,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abondoa/gq-server.git"
+    "url": "git+https://github.com/tikked/rest-api.git"
   },
   "author": "Alex Bondo Andersen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/abondoa/gq-server/issues"
+    "url": "https://github.com/tikked/rest-api/issues"
   },
-  "homepage": "https://github.com/abondoa/gq-server#readme",
+  "homepage": "https://github.com/tikked/rest-api#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "command-line-args": "^5.1.1",
-    "command-line-usage": "^6.0.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "gq": "github:abondoa/gq",
     "inversify": "^5.0.1",
     "inversify-express-utils": "^6.3.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.2",
+    "tikked-core": "github:tikked/core",
+    "tikked-persistency": "github:tikked/persistency"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
