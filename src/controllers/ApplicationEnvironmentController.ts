@@ -14,7 +14,7 @@ import { distinctUntilChanged, map, skip, take, timeout } from 'rxjs/operators';
 @controller('/application-environment')
 export class ApplicationEnvironmentController implements interfaces.Controller {
 
-    constructor(
+    public constructor(
         @inject(ApplicationEnvironmentRepository) private repo: ApplicationEnvironmentRepository) {}
 
     @httpGet('/:id')
@@ -25,26 +25,29 @@ export class ApplicationEnvironmentController implements interfaces.Controller {
     @httpGet('/:id/feature-set')
     private featureSet(
         @requestParam('id') id: string,
-        @request() req: express.Request): Promise<Iterable<string> | void> {
-            const context = new Context(req.query);
-            const wait = req.query.wait === 'true';
-            return this.repo.get(id).pipe(
-                map(appEnv => appEnv.getFeatureSet(context)),
-                distinctUntilChanged((x, y) => eqSet(x, y)),
-                skip(wait ? 1 : 0),
-                wait ? timeout(60000) : map(x => x),
-                take(1),
-                map(x => [...x])
-            ).toPromise().catch(err => {
-                if (!wait) {
-                    throw err;
-                }
-            });
+            @request() req: express.Request): Promise<Iterable<string> | void> {
+        const data = Object.entries(req.query)
+            .filter(([_, value]) => typeof value === 'string')
+            .reduce((prev, [key, value]) => ({...prev, [key]: value}), {});
+        const context = new Context(data);
+        const wait = req.query.wait === 'true';
+        return this.repo.get(id).pipe(
+            map(appEnv => appEnv.getFeatureSet(context)),
+            distinctUntilChanged((x, y) => eqSet(x, y)),
+            skip(wait ? 1 : 0),
+            wait ? timeout(60000) : map(x => x),
+            take(1),
+            map(x => [...x])
+        ).toPromise().catch(err => {
+            if (!wait) {
+                throw err;
+            }
+        });
     }
 }
 
-function eqSet<T>(as: Set<T>, bs: Set<T>) {
+const eqSet = <T>(as: Set<T>, bs: Set<T>) => {
     if (as.size !== bs.size) return false;
     for (const a of as) if (!bs.has(a)) return false;
     return true;
-}
+};
