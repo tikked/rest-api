@@ -2,47 +2,60 @@ import * as express from 'express';
 import { ApplicationEnvironment, Context } from 'tikked-core';
 import { ApplicationEnvironmentRepository } from 'tikked-persistency';
 import { inject } from 'inversify';
-import {
-    controller,
-    httpGet,
-    interfaces,
-    request,
-    requestParam
-} from 'inversify-express-utils';
+import { controller, httpGet, interfaces, request, requestParam } from 'inversify-express-utils';
 import { distinctUntilChanged, map, skip, take, timeout } from 'rxjs/operators';
 
 @controller('/application-environment')
 export class ApplicationEnvironmentController implements interfaces.Controller {
-
     public constructor(
-        @inject(ApplicationEnvironmentRepository) private repo: ApplicationEnvironmentRepository) {}
+        @inject(ApplicationEnvironmentRepository) private repo: ApplicationEnvironmentRepository
+    ) {}
 
     @httpGet('/:id')
-    private index(@requestParam('id') id: string): Promise<ApplicationEnvironment> {
-        return this.repo.get(id).pipe(take(1)).toPromise();
+    private index(
+        @requestParam('id')
+        id: string,
+        @request()
+        req: express.Request
+    ): Promise<string> {
+        const wait = req.query.wait === 'true';
+        return this.repo
+            .getStringified(id)
+            .pipe(
+                distinctUntilChanged((x, y) => x === y),
+                skip(wait ? 1 : 0),
+                wait ? timeout(60000) : map(x => x),
+                take(1)
+            )
+            .toPromise();
     }
 
     @httpGet('/:id/feature-set')
     private featureSet(
         @requestParam('id') id: string,
-            @request() req: express.Request): Promise<Iterable<string> | void> {
+        @request() req: express.Request
+    ): Promise<Iterable<string> | void> {
         const data = Object.entries(req.query)
             .filter(([_, value]) => typeof value === 'string')
-            .reduce((prev, [key, value]) => ({...prev, [key]: value}), {});
+            .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
         const context = new Context(data);
         const wait = req.query.wait === 'true';
-        return this.repo.get(id).pipe(
-            map(appEnv => appEnv.getFeatureSet(context)),
-            distinctUntilChanged((x, y) => eqSet(x, y)),
-            skip(wait ? 1 : 0),
-            wait ? timeout(60000) : map(x => x),
-            take(1),
-            map(x => [...x])
-        ).toPromise().catch(err => {
-            if (!wait) {
-                throw err;
-            }
-        });
+        return this.repo
+            .get(id)
+            .pipe(
+                map(appEnv => appEnv.getFeatureSet(context)),
+                distinctUntilChanged((x, y) => eqSet(x, y)),
+                skip(wait ? 1 : 0),
+                wait ? timeout(60000) : map(x => x),
+                take(1),
+                map(x => [...x])
+            )
+            .toPromise()
+            .catch(err => {
+                if (!wait) {
+                    throw err;
+                }
+            });
     }
 }
 
