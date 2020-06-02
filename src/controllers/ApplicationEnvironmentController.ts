@@ -17,10 +17,10 @@ export class ApplicationEnvironmentController implements interfaces.Controller {
         id: string,
         @request()
         req: express.Request
-    ): Promise<string> {
+    ): Promise<ApplicationEnvironment> {
         const wait = req.query.wait === 'true';
         return this.repo
-            .getStringified(id)
+            .get(id)
             .pipe(
                 distinctUntilChanged((x, y) => x === y),
                 skip(wait ? 1 : 0),
